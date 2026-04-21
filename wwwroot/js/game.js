@@ -310,4 +310,8 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById('btn-reset-game').addEventListener('click', () => {
         connection.invoke("ResetGame", roomCode).catch(err => console.error(err.toString()));
     });
+
+    document.getElementById('btn-go-home').addEventListener('click', () => {
+        location.reload();
+    });
 });
