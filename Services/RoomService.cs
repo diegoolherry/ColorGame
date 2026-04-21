@@ -39,19 +39,13 @@ namespace ColorGame.Services
             lock (_lock)
             {
                 if (!_rooms.TryGetValue(code, out var room))
-                {
                     return (null, "La sala no existe");
-                }
 
                 if (room.Game.IsStarted)
-                {
                     return (null, "El juego ya ha comenzado");
-                }
 
                 if (room.Players.Any(p => p.Name.Equals(playerName, StringComparison.OrdinalIgnoreCase)))
-                {
                     return (null, "El nombre ya está en uso en esta sala");
-                }
 
                 room.Players.Add(new Player
                 {
@@ -93,30 +87,46 @@ namespace ColorGame.Services
                     var player = room.Players.First(p => p.ConnectionId == connectionId);
                     room.Players.Remove(player);
 
-                    // Optional: If room is empty, remove it. Admin leaving logic might be handled in Hub too.
                     if (room.Players.Count == 0)
-                    {
                         _rooms.Remove(room.Code);
-                    }
                 }
             }
         }
 
-        public void ResetGame(string code)
+        /// <summary>
+        /// Resets the game state for a new Partida within the same round.
+        /// Preserves the room's History and transfers UsedColors to BannedColors.
+        /// </summary>
+        public void StartNextPartida(string code)
         {
             lock (_lock)
             {
-                if (_rooms.TryGetValue(code, out var room))
-                {
-                    room.Game = new GameState();
-                    foreach (var player in room.Players)
-                    {
-                        player.AccumulatedSeconds = 0;
-                    }
-                }
+                if (!_rooms.TryGetValue(code, out var room)) return;
+
+                // Transfer colors from the just-finished game to BannedColors
+                room.BannedColors = new HashSet<string>(room.Game.UsedColors);
+
+                // Reset game state for the new partida
+                room.Game = new GameState();
             }
         }
-        
+
+        /// <summary>
+        /// Full room reset: clears history, banned colors, and game state.
+        /// Used when returning to lobby.
+        /// </summary>
+        public void ResetRoom(string code)
+        {
+            lock (_lock)
+            {
+                if (!_rooms.TryGetValue(code, out var room)) return;
+
+                room.Game = new GameState();
+                room.History.Clear();
+                room.BannedColors.Clear();
+            }
+        }
+
         public void RemoveRoom(string code)
         {
             lock (_lock)

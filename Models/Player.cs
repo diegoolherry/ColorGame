@@ -6,7 +6,5 @@ namespace ColorGame.Models
         public string ConnectionId { get; set; } = "";
         public string Name { get; set; } = "";
         public string Role { get; set; } = "Player"; // "Admin" or "Player"
-        public double AccumulatedSeconds { get; set; } = 0;
-        public List<string> Colors { get; set; } = new();
     }
 }

@@ -2,11 +2,6 @@
     ViewData["Title"] = "¡A jugar!";
 }
 
-<div id="connection-overlay" class="d-none w-100 text-center position-fixed top-0 start-0 h-100 d-flex flex-column justify-content-center align-items-center" style="background: rgba(0,0,0,0.7); z-index: 1050; backdrop-filter: blur(10px);">
-    <div class="spinner-border text-light border-4" style="width: 4rem; height: 4rem;" role="status"></div>
-    <h3 class="mt-4 text-white fw-bold">Conectando al servidor mágico...</h3>
-</div>
-
 <style>
     #btn-stack-page:hover {
         background: white !important;
@@ -14,7 +9,33 @@
         transform: translateY(-2px);
         box-shadow: 0 8px 20px rgba(0,0,0,0.25);
     }
+    /* Banned colors badge strip */
+    .banned-color-badge {
+        display: inline-block;
+        padding: 0.25rem 0.8rem;
+        border-radius: 50rem;
+        background: rgba(255, 60, 60, 0.2);
+        border: 1px solid rgba(255, 80, 80, 0.5);
+        color: #FFB3B3;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin: 0.2rem;
+    }
+    /* Partida name input highlight */
+    #partida-name-input {
+        border-color: rgba(255, 180, 60, 0.7) !important;
+        box-shadow: 0 0 12px rgba(255, 180, 60, 0.3) !important;
+    }
+    /* Leaderboard medal colors */
+    .medal-1 { color: #FFD700; }
+    .medal-2 { color: #C0C0C0; }
+    .medal-3 { color: #CD7F32; }
 </style>
+
+<div id="connection-overlay" class="d-none w-100 text-center position-fixed top-0 start-0 h-100 d-flex flex-column justify-content-center align-items-center" style="background: rgba(0,0,0,0.7); z-index: 1050; backdrop-filter: blur(10px);">
+    <div class="spinner-border text-light border-4" style="width: 4rem; height: 4rem;" role="status"></div>
+    <h3 class="mt-4 text-white fw-bold">Conectando al servidor mágico...</h3>
+</div>
 
 <!-- SECTION INITIAL -->
 <div id="section-initial">
@@ -33,9 +54,7 @@
     <div class="row g-5 max-w-4xl mx-auto justify-content-center" style="max-width: 900px;">
         <div class="col-md-6">
             <div class="glass-card h-100 text-center w-100">
-                <div class="mb-4">
-                    <span style="font-size: 4rem;">👑</span>
-                </div>
+                <div class="mb-4"><span style="font-size: 4rem;">👑</span></div>
                 <h2 class="mb-4 fw-bold">Crear Nueva Sala</h2>
                 <input type="text" id="admin-name" class="form-control form-control-glass mb-4" placeholder="Ingresa tu nombre..." autocomplete="off" />
                 <button id="btn-create-room" class="btn btn-glass btn-action w-100 fs-5 py-3">Iniciar Aventura</button>
@@ -44,9 +63,7 @@
         </div>
         <div class="col-md-6">
             <div class="glass-card h-100 text-center w-100">
-                <div class="mb-4">
-                    <span style="font-size: 4rem;">🤝</span>
-                </div>
+                <div class="mb-4"><span style="font-size: 4rem;">🤝</span></div>
                 <h2 class="mb-4 fw-bold">Unirse a Sala</h2>
                 <input type="text" id="player-name" class="form-control form-control-glass mb-3" placeholder="Ingresa tu nombre..." autocomplete="off" />
                 <input type="text" id="join-code" class="form-control form-control-glass mb-4 text-center code-display-input" style="font-size: 1.5rem; letter-spacing: 0.5rem; text-transform: uppercase;" placeholder="CÓDIGO" maxlength="6" autocomplete="off" />
@@ -62,15 +79,13 @@
     <div class="mx-auto" style="max-width: 800px;">
         <div class="glass-card text-center relative overflow-hidden">
             <div class="position-absolute top-0 start-0 w-100 h-100" style="background: radial-gradient(circle at center, rgba(255,255,255,0.1) 0%, transparent 60%); z-index: -1;"></div>
-            
+
             <h5 class="text-uppercase text-white-50 tracking-wider mb-2">Código de Invitación</h5>
             <div class="code-display" id="lobby-code"></div>
             <button id="btn-copy-code" class="btn btn-glass btn-sm mb-5 px-4 rounded-pill">📋 Copiar al portapapeles</button>
 
             <h4 class="mb-4 fw-bold border-bottom border-white-50 pb-3">Jugadores Listos (<span id="lobby-player-count">0</span>)</h4>
-            <div id="lobby-players" class="d-flex flex-wrap justify-content-center gap-3 mb-5">
-                <!-- Players inserted here as badge-glass -->
-            </div>
+            <div id="lobby-players" class="d-flex flex-wrap justify-content-center gap-3 mb-5"></div>
 
             <div id="lobby-admin-controls" class="d-none">
                 <button id="btn-start-game" class="btn btn-glass btn-action btn-lg px-5 py-3 fs-4 w-100 shadow-lg" disabled>¡Comenzar el Juego!</button>
@@ -88,11 +103,23 @@
 <div id="section-game" class="d-none row g-4 max-w-6xl mx-auto align-items-stretch" style="max-width: 1200px;">
     <div class="col-lg-8">
         <div class="glass-card text-center d-flex flex-column justify-content-center h-100" style="min-height: 500px;">
+            <!-- Partida name + number -->
+            <div class="mb-2 d-flex justify-content-center align-items-center gap-3">
+                <span id="partida-badge" class="fw-bold rounded-pill px-3 py-1" style="background:rgba(255,255,255,0.12); font-size:0.85rem; letter-spacing:1px;"></span>
+                <span id="partida-name-display" class="fw-bold" style="color:#FFB43C; font-size:1rem;"></span>
+            </div>
+
             <div id="turn-header-container" class="mb-4 p-3 transition-all duration-300">
                 <h2 id="turn-header" class="mb-0 fs-1">Turno de: <span id="current-player" class="fw-bold fs-1" style="color: #92FE9D;"></span></h2>
             </div>
-            
-            <div class="timer-display mb-5" id="timer-display">00:00.0</div>
+
+            <div class="timer-display mb-4" id="timer-display">00:00.0</div>
+
+            <!-- Partida name input (only shown on turn 0 for first player) -->
+            <div id="partida-name-section" class="d-none mx-auto mb-3 w-100" style="max-width:500px;">
+                <label class="text-white-50 text-uppercase fw-bold mb-1" style="font-size:0.75rem; letter-spacing:1px;">📛 Nombra esta partida</label>
+                <input type="text" id="partida-name-input" class="form-control form-control-glass text-center" placeholder="Ej: La Batalla de los Pasteles..." autocomplete="off" maxlength="40" />
+            </div>
 
             <div id="my-turn-controls" class="d-none mx-auto w-100" style="max-width: 500px;">
                 <div class="input-group input-group-lg mb-3 shadow-lg rounded-pill overflow-hidden">
@@ -109,16 +136,17 @@
         </div>
     </div>
     <div class="col-lg-4 d-flex flex-column gap-4">
-        <div class="glass-card flex-grow-1 p-4 d-flex flex-column" style="padding: 1.5rem !important;">
+        <!-- Accumulated times -->
+        <div class="glass-card flex-grow-0 p-4 d-flex flex-column" style="padding: 1.5rem !important;">
             <h5 class="fw-bold mb-3 border-bottom border-white-50 pb-2 text-uppercase tracking-wider fs-6">⏱️ Tiempo acumulado</h5>
-            <div class="flex-grow-1 overflow-auto pe-2" style="max-height: 200px;">
-                <ul class="list-group list-group-flush list-group-glass" id="game-times-list">
-                    <!-- Times -->
-                </ul>
-            </div>
+            <ul class="list-group list-group-flush list-group-glass" id="game-times-list"></ul>
         </div>
-        
-
+        <!-- Banned colors panel -->
+        <div id="banned-colors-panel" class="glass-card flex-grow-0 p-4 d-none" style="padding: 1.5rem !important; border-color: rgba(255,80,80,0.4);">
+            <h5 class="fw-bold mb-2 border-bottom pb-2 text-uppercase fs-6" style="border-color:rgba(255,80,80,0.3); color:#FFB3B3;">🚫 Colores Prohibidos</h5>
+            <p class="text-white-50 mb-2" style="font-size:0.8rem;">Usados en la partida anterior:</p>
+            <div id="banned-colors-list" class="d-flex flex-wrap gap-1"></div>
+        </div>
     </div>
 </div>
 
@@ -127,7 +155,7 @@
     <div class="mx-auto" style="max-width: 700px;">
         <div class="glass-card text-center" style="background: rgba(255, 50, 100, 0.2); border-color: rgba(255, 50, 100, 0.4);">
             <div class="mb-4" style="font-size: 6rem; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);">🤯</div>
-            
+
             <style>
                 @@keyframes popIn {
                     0% { transform: scale(0); opacity: 0; }
@@ -137,15 +165,15 @@
             </style>
 
             <h1 class="display-3 fw-bold mb-2">¡<span id="loser-name" class="text-white"></span> perdió!</h1>
-            <h3 class="fw-light mb-5 bg-black bg-opacity-25 d-inline-block px-4 py-2 rounded-pill">Repitió el color: <strong id="losing-color" style="color: #FFB8D2;"></strong></h3>
-            
-            <p class="fs-4 mb-4">La partida duró <strong id="total-time"></strong></p>
+            <h3 class="fw-light mb-2 bg-black bg-opacity-25 d-inline-block px-4 py-2 rounded-pill">Repitió el color: <strong id="losing-color" style="color: #FFB8D2;"></strong></h3>
+            <p class="text-white-50 mb-4" id="gameover-partida-name" style="font-size:0.9rem;"></p>
 
-            <!-- Game Stats Header above the table -->
+            <!-- Game Stats Header -->
             <div class="mb-4 p-4 rounded-4" style="background: rgba(0,0,0,0.25);">
                 <p class="fw-bold text-uppercase text-white-50 mb-2" style="letter-spacing: 2px; font-size: 0.85rem;">Estadísticas Finales</p>
                 <p class="fs-2 fw-bold mb-0">Tiempo de juego: <span id="total-time-display" style="color: #00C9FF;"></span></p>
             </div>
+            <p class="fs-5 mb-4 text-white-50">La partida duró <strong id="total-time" class="text-white"></strong></p>
 
             <div class="table-responsive mx-auto mb-5 rounded-4 overflow-hidden" style="max-width: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
                 <table class="table table-borderless table-glass m-0 align-middle">
@@ -157,22 +185,54 @@
                             <th class="pe-4 text-end">Tiempo</th>
                         </tr>
                     </thead>
-                    <tbody id="scores-table-body">
-                        <!-- Scores -->
-                    </tbody>
+                    <tbody id="scores-table-body"></tbody>
                 </table>
             </div>
 
             <div id="gameover-admin-controls" class="d-none">
-                <button id="btn-reset-game" class="btn btn-glass btn-action w-100 py-3 fs-4 shadow-lg mb-3">Revancha Inmediata 🔄</button>
+                <div class="d-flex gap-3 mb-3">
+                    <button id="btn-next-partida" class="btn btn-action w-100 py-3 fs-5 shadow-lg">Siguiente Partida ▶</button>
+                    <button id="btn-end-round" class="btn btn-glass w-100 py-3 fs-5 shadow-lg" style="border-color:rgba(255,180,60,0.5); color:#FFB43C;">Terminar Ronda 🏆</button>
+                </div>
             </div>
             <div id="gameover-player-message" class="d-none mb-3">
                 <div class="p-3 rounded-pill" style="background: rgba(0,0,0,0.3);">
-                    <span class="fs-5 text-white-50">El administrador está decidiendo si reiniciar...</span>
+                    <span class="fs-5 text-white-50">El administrador está decidiendo qué hacer...</span>
                 </div>
             </div>
-            
-            <button id="btn-go-home" class="btn btn-glass w-100 py-3 fs-4 shadow-sm">Volver al Inicio 🏠</button>
+
+            <button id="btn-go-home" class="btn btn-glass w-100 py-3 fs-5 shadow-sm">Volver al Inicio 🏠</button>
+        </div>
+    </div>
+</div>
+
+<!-- SECTION LEADERBOARD -->
+<div id="section-leaderboard" class="d-none">
+    <div class="mx-auto" style="max-width: 800px;">
+        <div class="glass-card text-center" style="background: rgba(255,180,60,0.1); border-color: rgba(255,180,60,0.35);">
+            <div class="mb-3" style="font-size: 5rem;">🏆</div>
+            <h1 class="display-4 fw-bold mb-1">Leaderboard Final</h1>
+            <p class="text-white-50 mb-5">Ranking de partidas de esta ronda — de mayor a menor duración</p>
+
+            <div class="table-responsive mx-auto mb-5 rounded-4 overflow-hidden" style="box-shadow: 0 10px 30px rgba(0,0,0,0.35);">
+                <table class="table table-borderless table-glass m-0 align-middle">
+                    <thead style="background: rgba(0,0,0,0.5);">
+                        <tr>
+                            <th class="ps-4">Puesto</th>
+                            <th>Nombre de la Partida</th>
+                            <th>Perdedor</th>
+                            <th>Color repetido</th>
+                            <th class="pe-4 text-end">Duración</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboard-table-body"></tbody>
+                </table>
+            </div>
+
+            <div id="leaderboard-admin-controls" class="d-none mb-3">
+                <button id="btn-new-round" class="btn btn-action w-100 py-3 fs-4 shadow-lg">Nueva Ronda 🔄</button>
+            </div>
+            <button id="btn-leaderboard-home" class="btn btn-glass w-100 py-3 fs-5 shadow-sm">Volver al Inicio 🏠</button>
         </div>
     </div>
 </div>

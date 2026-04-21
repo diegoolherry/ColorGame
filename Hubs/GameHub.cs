@@ -17,6 +17,10 @@ namespace ColorGame.Hubs
             _roomService = roomService;
         }
 
+        // ─────────────────────────────────────────────────────────────────────
+        // ROOM MANAGEMENT
+        // ─────────────────────────────────────────────────────────────────────
+
         public async Task CreateRoom(string adminName)
         {
             var room = _roomService.CreateRoom(adminName, Context.ConnectionId);
@@ -27,7 +31,7 @@ namespace ColorGame.Hubs
         public async Task JoinRoom(string roomCode, string playerName)
         {
             var (room, error) = _roomService.JoinRoom(roomCode, playerName, Context.ConnectionId);
-            
+
             if (error != null)
             {
                 await Clients.Caller.SendAsync("JoinError", error);
@@ -35,11 +39,15 @@ namespace ColorGame.Hubs
             }
 
             await Groups.AddToGroupAsync(Context.ConnectionId, roomCode);
-            
+
             var playerNames = room!.Players.Select(p => p.Name).ToList();
             await Clients.Caller.SendAsync("JoinedRoom", roomCode, playerNames);
             await Clients.GroupExcept(roomCode, Context.ConnectionId).SendAsync("PlayerJoined", playerName, playerNames);
         }
+
+        // ─────────────────────────────────────────────────────────────────────
+        // GAME FLOW
+        // ─────────────────────────────────────────────────────────────────────
 
         public async Task StartGame(string roomCode)
         {
@@ -53,9 +61,14 @@ namespace ColorGame.Hubs
                 return;
             }
 
+            List<string> bannedColors;
+            string firstPlayer;
+            List<string> allNames;
+            int partidaNumber;
+
             lock (room)
             {
-                // Shuffle player order randomly
+                // Shuffle player order randomly (Fisher-Yates)
                 var rng = new Random();
                 var players = room.Players;
                 for (int i = players.Count - 1; i > 0; i--)
@@ -66,14 +79,25 @@ namespace ColorGame.Hubs
 
                 room.Game.IsStarted = true;
                 room.Game.CurrentPlayerIndex = 0;
+                room.Game.TurnNumber = 0;
+
+                // Initialize player stats for this partida
+                room.Game.CurrentPlayerStats = new Dictionary<string, PlayerStat>();
+                foreach (var p in room.GamePlayers)
+                {
+                    room.Game.CurrentPlayerStats[p.Name] = new PlayerStat { Name = p.Name };
+                }
+
+                bannedColors = room.BannedColors.ToList();
+                firstPlayer = room.GamePlayers[0].Name;
+                allNames = room.Players.Select(p => p.Name).ToList();
+                partidaNumber = room.History.Count + 1;
             }
 
-            var shuffledGamePlayers = room.GamePlayers;
-            var allNames = room.Players.Select(p => p.Name).ToList();
-            await Clients.Group(roomCode).SendAsync("GameStarted", shuffledGamePlayers[0].Name, allNames);
+            await Clients.Group(roomCode).SendAsync("GameStarted", firstPlayer, allNames, bannedColors, partidaNumber);
         }
 
-        public async Task SubmitColor(string roomCode, string color, double elapsedSeconds)
+        public async Task SubmitColor(string roomCode, string color, double elapsedSeconds, string? partidaName)
         {
             var room = _roomService.GetRoom(roomCode);
             if (room == null || !room.Game.IsStarted || room.Game.IsOver) return;
@@ -83,9 +107,11 @@ namespace ColorGame.Hubs
             string losingColor = "";
             double totalSeconds = 0;
             List<object>? scores = null;
-            
+
             string nextPlayerName = "";
             string currentPlayerName = "";
+            bool isFirstTurn = false;
+            string resolvedPartidaName = "";
 
             lock (room)
             {
@@ -93,46 +119,94 @@ namespace ColorGame.Hubs
                 if (gamePlayers.Count == 0 || room.Game.CurrentPlayerIndex >= gamePlayers.Count) return;
 
                 var currentPlayer = gamePlayers[room.Game.CurrentPlayerIndex];
-                if (currentPlayer.ConnectionId != Context.ConnectionId) return; // Not their turn
+                if (currentPlayer.ConnectionId != Context.ConnectionId) return;
 
                 string normalizedColor = color.Trim().ToLower();
 
-                currentPlayer.AccumulatedSeconds += elapsedSeconds;
+                // On first turn, record the partida name
+                if (room.Game.TurnNumber == 0)
+                {
+                    room.Game.PartidaName = string.IsNullOrWhiteSpace(partidaName)
+                        ? $"Partida {room.History.Count + 1}"
+                        : partidaName.Trim();
+                    isFirstTurn = true;
+                }
+                resolvedPartidaName = room.Game.PartidaName;
+
+                // Get or create player stat
+                if (!room.Game.CurrentPlayerStats.TryGetValue(currentPlayer.Name, out var stat))
+                {
+                    stat = new PlayerStat { Name = currentPlayer.Name };
+                    room.Game.CurrentPlayerStats[currentPlayer.Name] = stat;
+                }
+
+                stat.AccumulatedSeconds += elapsedSeconds;
                 room.Game.TotalSeconds += elapsedSeconds;
 
-                if (room.Game.UsedColors.Contains(normalizedColor))
+                // Check both used colors AND banned colors
+                bool isUsed   = room.Game.UsedColors.Contains(normalizedColor);
+                bool isBanned = room.BannedColors.Contains(normalizedColor);
+
+                if (isUsed || isBanned)
                 {
-                    // Game Over — also record the losing (repeated) color
-                    currentPlayer.Colors.Add(color);
+                    // Record the losing color and finalize
+                    stat.Colors.Add(color);
 
                     room.Game.IsOver = true;
                     room.Game.LoserName = currentPlayer.Name;
-                    room.Game.LosingColor = color; // original
+                    room.Game.LosingColor = color;
+
+                    string reason = isBanned ? "prohibido (partida anterior)" : "repetido";
 
                     isGameOver = true;
-                    loserName = room.Game.LoserName;
-                    losingColor = room.Game.LosingColor;
+                    loserName = currentPlayer.Name;
+                    losingColor = color;
                     totalSeconds = room.Game.TotalSeconds;
                     scores = gamePlayers
-                        .OrderBy(p => p.AccumulatedSeconds)
-                        .Select(p => (object)new { Name = p.Name, AccumulatedSeconds = p.AccumulatedSeconds, Colors = p.Colors })
+                        .Select(p =>
+                        {
+                            var s = room.Game.CurrentPlayerStats.TryGetValue(p.Name, out var ps)
+                                ? ps
+                                : new PlayerStat { Name = p.Name };
+                            return (object)new
+                            {
+                                Name = s.Name,
+                                AccumulatedSeconds = s.AccumulatedSeconds,
+                                Colors = s.Colors,
+                                IsLoser = p.Name == currentPlayer.Name
+                            };
+                        })
+                        .OrderBy(x => ((dynamic)x).AccumulatedSeconds)
                         .ToList();
+
+                    // Save completed partida to room history
+                    var partida = new Partida
+                    {
+                        Number = room.History.Count + 1,
+                        Name = room.Game.PartidaName,
+                        TotalSeconds = room.Game.TotalSeconds,
+                        UsedColors = new List<string>(room.Game.UsedColors),
+                        LoserName = currentPlayer.Name,
+                        LosingColor = color,
+                        PlayerStats = room.Game.CurrentPlayerStats.Values.ToList()
+                    };
+                    room.History.Add(partida);
                 }
                 else
                 {
-                    // Continue — record the valid color
-                    currentPlayer.Colors.Add(color);
+                    // Valid color — record it
+                    stat.Colors.Add(color);
                     room.Game.UsedColors.Add(normalizedColor);
+                    room.Game.TurnNumber++;
                     currentPlayerName = currentPlayer.Name;
                     room.Game.CurrentPlayerIndex = (room.Game.CurrentPlayerIndex + 1) % gamePlayers.Count;
-                    var nextPlayer = gamePlayers[room.Game.CurrentPlayerIndex];
-                    nextPlayerName = nextPlayer.Name;
+                    nextPlayerName = gamePlayers[room.Game.CurrentPlayerIndex].Name;
                 }
             }
 
             if (isGameOver)
             {
-                await Clients.Group(roomCode).SendAsync("GameOver", loserName, losingColor, totalSeconds, scores);
+                await Clients.Group(roomCode).SendAsync("GameOver", loserName, losingColor, totalSeconds, scores, resolvedPartidaName);
             }
             else if (!string.IsNullOrEmpty(nextPlayerName))
             {
@@ -140,21 +214,63 @@ namespace ColorGame.Hubs
             }
         }
 
+        /// <summary>
+        /// Admin starts the next Partida within the same Ronda.
+        /// Preserves history, bans old colors, resets game state.
+        /// </summary>
+        public async Task NextPartida(string roomCode)
+        {
+            var room = _roomService.GetRoom(roomCode);
+            if (room == null || room.Admin?.ConnectionId != Context.ConnectionId) return;
+
+            _roomService.StartNextPartida(roomCode);
+
+            var names = room.Players.Select(p => p.Name).ToList();
+            var bannedColors = room.BannedColors.ToList();
+            await Clients.Group(roomCode).SendAsync("NextPartidaReady", names, bannedColors);
+        }
+
+        /// <summary>
+        /// Admin ends the entire round and shows the Leaderboard.
+        /// </summary>
+        public async Task EndRound(string roomCode)
+        {
+            var room = _roomService.GetRoom(roomCode);
+            if (room == null || room.Admin?.ConnectionId != Context.ConnectionId) return;
+
+            // Order history: longest game first (descending by TotalSeconds)
+            var leaderboard = room.History
+                .OrderByDescending(p => p.TotalSeconds)
+                .Select((p, i) => (object)new
+                {
+                    Position  = i + 1,
+                    Name      = p.Name,
+                    TotalSeconds = p.TotalSeconds,
+                    LoserName = p.LoserName,
+                    LosingColor = p.LosingColor,
+                    Number    = p.Number
+                })
+                .ToList();
+
+            await Clients.Group(roomCode).SendAsync("RoundEnded", leaderboard);
+        }
+
+        /// <summary>
+        /// Admin fully resets — clears history and goes back to lobby.
+        /// </summary>
         public async Task ResetGame(string roomCode)
         {
             var room = _roomService.GetRoom(roomCode);
             if (room == null || room.Admin?.ConnectionId != Context.ConnectionId) return;
 
-            // Clear per-player colors before resetting
-            foreach (var player in room.Players)
-            {
-                player.Colors.Clear();
-            }
-
-            _roomService.ResetGame(roomCode);
+            _roomService.ResetRoom(roomCode);
             var names = room.Players.Select(p => p.Name).ToList();
             await Clients.Group(roomCode).SendAsync("GameReset", names);
         }
+
+        // ─────────────────────────────────────────────────────────────────────
+        // DISCONNECTION
+        // ─────────────────────────────────────────────────────────────────────
 
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
@@ -167,11 +283,11 @@ namespace ColorGame.Hubs
                     bool isAdmin = room.Admin?.ConnectionId == Context.ConnectionId;
                     var player = room.Players.FirstOrDefault(p => p.ConnectionId == Context.ConnectionId);
                     string? leavingPlayerName = player?.Name;
-                    
+
                     int indexBeforeRemoval = -1;
                     if (player != null && player.Role == "Player" && room.Game.IsStarted && !room.Game.IsOver)
                     {
-                         indexBeforeRemoval = room.GamePlayers.IndexOf(player);
+                        indexBeforeRemoval = room.GamePlayers.IndexOf(player);
                     }
 
                     _roomService.RemovePlayerByConnection(Context.ConnectionId);
@@ -186,29 +302,31 @@ namespace ColorGame.Hubs
                         var names = room.Players.Select(p => p.Name).ToList();
                         await Clients.Group(roomCode).SendAsync("PlayerLeft", leavingPlayerName, names);
 
-                        // If game in progress and this player left
                         if (room.Game.IsStarted && !room.Game.IsOver)
                         {
                             var gamePlayers = room.GamePlayers;
                             if (gamePlayers.Count < 2)
                             {
-                                // End game if less than 2 players remain
                                 room.Game.IsOver = true;
                                 room.Game.LoserName = "Nadie (abandonaron)";
                                 room.Game.LosingColor = "N/A";
-                                
+
                                 var scores = gamePlayers
-                                    .OrderBy(p => p.AccumulatedSeconds)
-                                    .Select(p => new { Name = p.Name, AccumulatedSeconds = p.AccumulatedSeconds })
+                                    .Select(p =>
+                                    {
+                                        var s = room.Game.CurrentPlayerStats.TryGetValue(p.Name, out var ps)
+                                            ? ps : new PlayerStat { Name = p.Name };
+                                        return (object)new { Name = s.Name, AccumulatedSeconds = s.AccumulatedSeconds, Colors = s.Colors, IsLoser = false };
+                                    })
+                                    .OrderBy(x => ((dynamic)x).AccumulatedSeconds)
                                     .ToList();
 
-                                await Clients.Group(roomCode).SendAsync("GameOver", room.Game.LoserName, room.Game.LosingColor, room.Game.TotalSeconds, scores);
+                                await Clients.Group(roomCode).SendAsync("GameOver", room.Game.LoserName, room.Game.LosingColor, room.Game.TotalSeconds, scores, room.Game.PartidaName);
                             }
                             else if (indexBeforeRemoval != -1)
                             {
                                 if (room.Game.CurrentPlayerIndex == indexBeforeRemoval)
                                 {
-                                    // It was their turn. Turn shifts to current index modulo count
                                     room.Game.CurrentPlayerIndex = room.Game.CurrentPlayerIndex % gamePlayers.Count;
                                     var nextPlayer = gamePlayers[room.Game.CurrentPlayerIndex];
                                     await Clients.Group(roomCode).SendAsync("NextTurn", nextPlayer.Name, "Abandono turno", leavingPlayerName);
