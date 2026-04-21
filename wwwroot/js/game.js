@@ -111,11 +111,6 @@ function setupSignalR() {
     });
 
     connection.on("NextTurn", (nextPlayer, submittedColor, prevPlayer) => {
-        const badge = document.createElement('span');
-        badge.className = 'badge bg-secondary fs-6';
-        badge.textContent = `${submittedColor} (${prevPlayer})`;
-        document.getElementById('used-colors').appendChild(badge);
-
         // Calculate and add elapsed time locally for UI smoothness, though server is truth
         if (turnStartTime) {
             const elapsed = (Date.now() - turnStartTime) / 1000;
@@ -139,8 +134,8 @@ function setupSignalR() {
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td>#${index + 1}</td>
-                <td class="${score.Name === loserName ? 'text-danger fw-bold' : ''}">${score.Name}</td>
-                <td>${formatTime(score.AccumulatedSeconds)}</td>
+                <td class="${score.name === loserName ? 'text-danger fw-bold' : ''}">${score.name}</td>
+                <td>${formatTime(score.accumulatedSeconds)}</td>
             `;
             tbody.appendChild(tr);
         });
