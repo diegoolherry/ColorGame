@@ -30,7 +30,7 @@ function stopTimer() {
 }
 
 function isMyTurn() {
-    return myRole === "Player" && myName === currentPlayerName;
+    return myName === currentPlayerName;
 }
 
 function formatTime(seconds) {
@@ -103,9 +103,7 @@ function setupSignalR() {
         currentPlayerName = firstPlayer;
         currentTimes = {};
         playersList.forEach(p => {
-            if (p !== roomCode + "_admin_") { // simplified assumption based on naming
-                 currentTimes[p] = 0;
-            }
+            currentTimes[p] = 0;
         });
         document.getElementById('used-colors').innerHTML = '';
         startGameTurn();
@@ -189,7 +187,7 @@ function updateLobby() {
     
     // Check if we have enough players to start (admin + at least 2 players = 3, or if admin is part of list, just allPlayers > 2... wait real logic is >= 2 gameplayers)
     if (myRole === "Admin") {
-        document.getElementById('btn-start-game').disabled = (allPlayers.length < 3); // 1 admin + 2 players
+        document.getElementById('btn-start-game').disabled = (allPlayers.length < 2);
     }
 
     const container = document.getElementById('lobby-players');

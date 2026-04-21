@@ -9,6 +9,6 @@ namespace ColorGame.Models
         public List<Player> Players { get; set; } = new();
         public GameState Game { get; set; } = new();
         public Player? Admin => Players.FirstOrDefault(p => p.Role == "Admin");
-        public List<Player> GamePlayers => Players.Where(p => p.Role == "Player").ToList();
+        public List<Player> GamePlayers => Players.ToList();
     }
 }
