@@ -1,0 +1,495 @@
+@{
+    ViewData["Title"] = "Stack Tecnológico";
+}
+
+<style>
+    .stack-hero {
+        text-align: center;
+        padding: 3rem 0 2rem;
+    }
+
+    .stack-hero h1 {
+        font-size: 3.5rem;
+        font-weight: 800;
+        background: linear-gradient(90deg, #00C9FF, #92FE9D);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 1rem;
+    }
+
+    .stack-hero p {
+        font-size: 1.2rem;
+        color: rgba(255,255,255,0.65);
+        max-width: 600px;
+        margin: 0 auto 2.5rem;
+    }
+
+    .back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(255,255,255,0.12);
+        border: 1.5px solid rgba(255,255,255,0.3);
+        color: white;
+        font-weight: 600;
+        border-radius: 2rem;
+        padding: 0.55rem 1.4rem;
+        font-size: 1rem;
+        text-decoration: none;
+        transition: all 0.3s;
+        margin-bottom: 2.5rem;
+    }
+
+    .back-btn:hover {
+        background: white;
+        color: #784BA0;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+    }
+
+    /* Category sections */
+    .stack-category {
+        margin-bottom: 2.5rem;
+    }
+
+    .category-title {
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        color: rgba(255,255,255,0.45);
+        margin-bottom: 1rem;
+        padding-left: 0.25rem;
+    }
+
+    /* Tech cards */
+    .tech-card {
+        background: rgba(255,255,255,0.08);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255,255,255,0.18);
+        border-radius: 1.5rem;
+        padding: 1.75rem;
+        height: 100%;
+        transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .tech-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 1.5rem;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .tech-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.35);
+        background: rgba(255,255,255,0.13);
+    }
+
+    .tech-icon {
+        font-size: 2.8rem;
+        margin-bottom: 1rem;
+        display: block;
+        line-height: 1;
+    }
+
+    .tech-name {
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        color: #fff;
+    }
+
+    .tech-version {
+        font-size: 0.78rem;
+        font-weight: 600;
+        padding: 0.2rem 0.65rem;
+        border-radius: 50rem;
+        background: rgba(255,255,255,0.12);
+        color: rgba(255,255,255,0.7);
+        display: inline-block;
+        margin-bottom: 0.9rem;
+        letter-spacing: 0.5px;
+    }
+
+    .tech-desc {
+        font-size: 0.92rem;
+        color: rgba(255,255,255,0.62);
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    .tech-role {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 0.2rem 0.7rem;
+        border-radius: 50rem;
+        margin-top: 1rem;
+        letter-spacing: 0.4px;
+    }
+
+    .role-backend  { background: rgba(0,201,255,0.18);  color: #00C9FF; border: 1px solid rgba(0,201,255,0.3);  }
+    .role-frontend { background: rgba(146,254,157,0.18); color: #92FE9D; border: 1px solid rgba(146,254,157,0.3); }
+    .role-realtime { background: rgba(255,180,60,0.18);  color: #FFB43C; border: 1px solid rgba(255,180,60,0.3);  }
+    .role-infra    { background: rgba(200,120,255,0.18); color: #C878FF; border: 1px solid rgba(200,120,255,0.3); }
+    .role-design   { background: rgba(255,80,160,0.18);  color: #FF50A0; border: 1px solid rgba(255,80,160,0.3);  }
+
+    /* Architecture diagram card */
+    .arch-card {
+        background: rgba(0,0,0,0.25);
+        border: 1px solid rgba(255,255,255,0.15);
+        border-radius: 1.5rem;
+        padding: 2rem;
+        margin-top: 0.5rem;
+    }
+
+    .arch-flow {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .arch-node {
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 0.75rem;
+        padding: 0.6rem 1.1rem;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .arch-arrow {
+        color: rgba(255,255,255,0.35);
+        font-size: 1.2rem;
+        font-weight: 300;
+    }
+
+    /* Stats bar */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2.5rem;
+    }
+
+    .stat-box {
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.15);
+        border-radius: 1.25rem;
+        padding: 1.25rem;
+        text-align: center;
+        transition: transform 0.3s;
+    }
+
+    .stat-box:hover { transform: translateY(-4px); }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 800;
+        background: linear-gradient(90deg, #00C9FF, #92FE9D);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        display: block;
+    }
+
+    .stat-label {
+        font-size: 0.78rem;
+        color: rgba(255,255,255,0.5);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-top: 0.2rem;
+    }
+</style>
+
+<!-- Back button -->
+<div class="text-center pt-3">
+    <a href="@Url.Action("Index", "Home")" class="back-btn">← Volver al juego</a>
+</div>
+
+<!-- Hero -->
+<div class="stack-hero">
+    <h1>Stack Tecnológico</h1>
+    <p>Una mirada detallada a las tecnologías, frameworks y patrones de arquitectura que hacen posible ColorGame en tiempo real.</p>
+</div>
+
+<!-- Quick Stats -->
+<div class="stats-grid mx-auto" style="max-width: 800px;">
+    <div class="stat-box">
+        <span class="stat-number">C#</span>
+        <div class="stat-label">Lenguaje Principal</div>
+    </div>
+    <div class="stat-box">
+        <span class="stat-number">.NET 8</span>
+        <div class="stat-label">Runtime</div>
+    </div>
+    <div class="stat-box">
+        <span class="stat-number">SignalR</span>
+        <div class="stat-label">Tiempo Real</div>
+    </div>
+    <div class="stat-box">
+        <span class="stat-number">MVC</span>
+        <div class="stat-label">Patrón</div>
+    </div>
+    <div class="stat-box">
+        <span class="stat-number">WS</span>
+        <div class="stat-label">Protocolo</div>
+    </div>
+</div>
+
+<div class="mx-auto" style="max-width: 1100px; padding-bottom: 3rem;">
+
+    <!-- Backend -->
+    <div class="stack-category">
+        <div class="category-title">⚙️ &nbsp;Backend</div>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="tech-card">
+                    <span class="tech-icon">🔷</span>
+                    <div class="tech-name">ASP.NET Core</div>
+                    <span class="tech-version">v8.0 LTS</span>
+                    <p class="tech-desc">Framework web de Microsoft de alto rendimiento. Maneja el ciclo de vida HTTP, el enrutamiento MVC, la inyección de dependencias y el servidor Kestrel integrado.</p>
+                    <span class="tech-role role-backend">🔧 Backend Core</span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="tech-card">
+                    <span class="tech-icon">🟣</span>
+                    <div class="tech-name">C# 12</div>
+                    <span class="tech-version">C# 12 / .NET 8</span>
+                    <p class="tech-desc">Lenguaje principal del proyecto. Se utilizan características modernas como tuplas de deconstrucción, records, pattern matching y lambdas tipadas para un código limpio y expresivo.</p>
+                    <span class="tech-role role-backend">🔧 Backend Core</span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="tech-card">
+                    <span class="tech-icon">🏗️</span>
+                    <div class="tech-name">Patrón MVC</div>
+                    <span class="tech-version">ASP.NET MVC</span>
+                    <p class="tech-desc">La arquitectura Model-View-Controller separa la lógica del negocio (Models/Services), las rutas (Controllers) y la presentación (Views con Razor). Facilita la mantenibilidad y testabilidad.</p>
+                    <span class="tech-role role-backend">🔧 Backend Core</span>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="tech-card">
+                    <span class="tech-icon">💉</span>
+                    <div class="tech-name">Inyección de Dependencias</div>
+                    <span class="tech-version">Built-in DI Container</span>
+                    <p class="tech-desc">El contenedor de DI nativo de .NET gestiona el ciclo de vida de servicios como <code style="background:rgba(255,255,255,0.12); padding: 0.1rem 0.4rem; border-radius:0.3rem;">RoomService</code> (registrado como Singleton), garantizando una única instancia compartida entre todos los hubs y controladores.</p>
+                    <span class="tech-role role-backend">🔧 Backend Core</span>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="tech-card">
+                    <span class="tech-icon">📦</span>
+                    <div class="tech-name">RoomService</div>
+                    <span class="tech-version">Servicio Singleton</span>
+                    <p class="tech-desc">Capa de servicio personalizada que actúa como repositorio en memoria. Gestiona el estado de todas las salas activas: creación, unión, avance de turnos, barajar jugadores y limpieza al desconectar.</p>
+                    <span class="tech-role role-backend">🔧 Backend Core</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tiempo Real -->
+    <div class="stack-category">
+        <div class="category-title">⚡ &nbsp;Comunicación en Tiempo Real</div>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="tech-card">
+                    <span class="tech-icon">🔌</span>
+                    <div class="tech-name">ASP.NET Core SignalR</div>
+                    <span class="tech-version">v8.0</span>
+                    <p class="tech-desc">Librería de comunicación bidireccional en tiempo real. Abstrae WebSockets, Server-Sent Events y Long Polling, eligiendo automáticamente el mejor transporte disponible. Permite que el servidor notifique a todos los clientes de una sala de forma instantánea.</p>
+                    <span class="tech-role role-realtime">⚡ Tiempo Real</span>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="tech-card">
+                    <span class="tech-icon">🌐</span>
+                    <div class="tech-name">GameHub</div>
+                    <span class="tech-version">SignalR Hub</span>
+                    <p class="tech-desc">Hub central que coordina toda la lógica multijugador. Expone métodos remotos invocables desde el cliente (<code style="background:rgba(255,255,255,0.12); padding:0.1rem 0.4rem; border-radius:0.3rem;">CreateRoom</code>, <code style="background:rgba(255,255,255,0.12); padding:0.1rem 0.4rem; border-radius:0.3rem;">JoinRoom</code>, <code style="background:rgba(255,255,255,0.12); padding:0.1rem 0.4rem; border-radius:0.3rem;">StartGame</code>, <code style="background:rgba(255,255,255,0.12); padding:0.1rem 0.4rem; border-radius:0.3rem;">SubmitColor</code>) y emite eventos de vuelta a grupos de conexiones.</p>
+                    <span class="tech-role role-realtime">⚡ Tiempo Real</span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="tech-card">
+                    <span class="tech-icon">🔄</span>
+                    <div class="tech-name">Groups SignalR</div>
+                    <span class="tech-version">Group Broadcasting</span>
+                    <p class="tech-desc">Cada sala de juego es un Group de SignalR identificado por su código único. Los mensajes se emiten solo a los miembros del grupo con <code style="background:rgba(255,255,255,0.12); padding:0.1rem 0.4rem; border-radius:0.3rem;">Clients.Group()</code>.</p>
+                    <span class="tech-role role-realtime">⚡ Tiempo Real</span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="tech-card">
+                    <span class="tech-icon">🔒</span>
+                    <div class="tech-name">Thread Safety</div>
+                    <span class="tech-version">lock() statement</span>
+                    <p class="tech-desc">El estado mutable de la sala (índice del jugador actual, colores usados) está protegido con bloques <code style="background:rgba(255,255,255,0.12); padding:0.1rem 0.4rem; border-radius:0.3rem;">lock(room)</code> para evitar condiciones de carrera en escenarios concurrentes.</p>
+                    <span class="tech-role role-realtime">⚡ Tiempo Real</span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="tech-card">
+                    <span class="tech-icon">♻️</span>
+                    <div class="tech-name">Reconexión Automática</div>
+                    <span class="tech-version">withAutomaticReconnect()</span>
+                    <p class="tech-desc">El cliente SignalR está configurado con reconexión automática. Si se pierde la conexión, el cliente reintenta y el servidor muestra un overlay de espera para no interrumpir la experiencia.</p>
+                    <span class="tech-role role-realtime">⚡ Tiempo Real</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Frontend -->
+    <div class="stack-category">
+        <div class="category-title">🎨 &nbsp;Frontend</div>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="tech-card">
+                    <span class="tech-icon">📄</span>
+                    <div class="tech-name">Razor / CSHTML</div>
+                    <span class="tech-version">ASP.NET Razor Engine</span>
+                    <p class="tech-desc">Motor de templates del lado del servidor que combina C# con HTML. Permite generar URLs tipadas con Tag Helpers como <code style="background:rgba(255,255,255,0.12); padding:0.1rem 0.4rem; border-radius:0.3rem;">asp-action</code> y <code style="background:rgba(255,255,255,0.12); padding:0.1rem 0.4rem; border-radius:0.3rem;">asp-controller</code>.</p>
+                    <span class="tech-role role-frontend">🎨 Frontend</span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="tech-card">
+                    <span class="tech-icon">🟦</span>
+                    <div class="tech-name">Bootstrap 5</div>
+                    <span class="tech-version">v5.3.0</span>
+                    <p class="tech-desc">Framework CSS para maquetado responsivo con grid, utilidades flexbox y componentes como badges, spinners y tablas. Consumido vía CDN para carga optimizada.</p>
+                    <span class="tech-role role-design">💅 Diseño</span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="tech-card">
+                    <span class="tech-icon">✨</span>
+                    <div class="tech-name">Glassmorphism UI</div>
+                    <span class="tech-version">CSS Vanilla</span>
+                    <p class="tech-desc">Diseño premium implementado en CSS puro con <code style="background:rgba(255,255,255,0.12); padding:0.1rem 0.4rem; border-radius:0.3rem;">backdrop-filter: blur()</code>, gradientes animados en el fondo (keyframes), transparencias y micro-animaciones en hover para cada tarjeta.</p>
+                    <span class="tech-role role-design">💅 Diseño</span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="tech-card">
+                    <span class="tech-icon">🟨</span>
+                    <div class="tech-name">JavaScript (Vanilla)</div>
+                    <span class="tech-version">ES2022 / game.js</span>
+                    <p class="tech-desc">Toda la lógica del cliente está en <code style="background:rgba(255,255,255,0.12); padding:0.1rem 0.4rem; border-radius:0.3rem;">game.js</code> sin frameworks externos: gestión de secciones SPA, temporizadores de turno con <code style="background:rgba(255,255,255,0.12); padding:0.1rem 0.4rem; border-radius:0.3rem;">setInterval</code> y manipulación del DOM.</p>
+                    <span class="tech-role role-frontend">🎨 Frontend</span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="tech-card">
+                    <span class="tech-icon">🔤</span>
+                    <div class="tech-name">Google Fonts — Outfit</div>
+                    <span class="tech-version">wght: 300–800</span>
+                    <p class="tech-desc">Tipografía moderna y geométrica que aporta legibilidad y personalidad al juego. Se cargan múltiples pesos para títulos (800), texto regular (400) y subtítulos (300/600).</p>
+                    <span class="tech-role role-design">💅 Diseño</span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="tech-card">
+                    <span class="tech-icon">🧭</span>
+                    <div class="tech-name">SPA Ligera</div>
+                    <span class="tech-version">show/hide sections</span>
+                    <p class="tech-desc">La experiencia de usuario fluye entre pantallas (inicial → lobby → juego → gameover) sin recargar la página. Las secciones se alternan con clases <code style="background:rgba(255,255,255,0.12); padding:0.1rem 0.4rem; border-radius:0.3rem;">d-none</code> de Bootstrap.</p>
+                    <span class="tech-role role-frontend">🎨 Frontend</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Infraestructura -->
+    <div class="stack-category">
+        <div class="category-title">🐳 &nbsp;Infraestructura & Despliegue</div>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="tech-card">
+                    <span class="tech-icon">🐳</span>
+                    <div class="tech-name">Docker</div>
+                    <span class="tech-version">Dockerfile multi-stage</span>
+                    <p class="tech-desc">El proyecto incluye un <code style="background:rgba(255,255,255,0.12); padding:0.1rem 0.4rem; border-radius:0.3rem;">Dockerfile</code> con build multi-etapa: una imagen de SDK para compilar y una imagen runtime optimizada. Esto minimiza el tamaño final de la imagen y facilita el despliegue en cualquier entorno.</p>
+                    <span class="tech-role role-infra">🏗️ Infraestructura</span>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="tech-card">
+                    <span class="tech-icon">🌍</span>
+                    <div class="tech-name">Kestrel Web Server</div>
+                    <span class="tech-version">ASP.NET Built-in</span>
+                    <p class="tech-desc">Servidor HTTP integrado de .NET, configurado para producción con soporte nativo de WebSockets necesarios para SignalR. Puede estar detrás de un reverse proxy (nginx, IIS) o exponerse directamente en Docker.</p>
+                    <span class="tech-role role-infra">🏗️ Infraestructura</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Arquitectura -->
+    <div class="stack-category">
+        <div class="category-title">🗺️ &nbsp;Arquitectura del Flujo de Datos</div>
+        <div class="arch-card">
+            <p class="text-center text-white-50 mb-3" style="font-size:0.85rem; letter-spacing:1px; text-transform:uppercase;">Flujo de una jugada</p>
+            <div class="arch-flow">
+                <div class="arch-node">🖥️ Cliente A<br><small style="font-weight:300; color:rgba(255,255,255,0.5)">game.js</small></div>
+                <span class="arch-arrow">→</span>
+                <div class="arch-node">🔌 SignalR WS<br><small style="font-weight:300; color:rgba(255,255,255,0.5)">invoke("SubmitColor")</small></div>
+                <span class="arch-arrow">→</span>
+                <div class="arch-node">⚙️ GameHub<br><small style="font-weight:300; color:rgba(255,255,255,0.5)">SubmitColor()</small></div>
+                <span class="arch-arrow">→</span>
+                <div class="arch-node">📦 RoomService<br><small style="font-weight:300; color:rgba(255,255,255,0.5)">Estado en memoria</small></div>
+                <span class="arch-arrow">→</span>
+                <div class="arch-node">📡 Broadcast<br><small style="font-weight:300; color:rgba(255,255,255,0.5)">Clients.Group()</small></div>
+                <span class="arch-arrow">→</span>
+                <div class="arch-node">🖥️ Todos los Clientes<br><small style="font-weight:300; color:rgba(255,255,255,0.5)">on("NextTurn" / "GameOver")</small></div>
+            </div>
+
+            <hr style="border-color: rgba(255,255,255,0.1); margin: 1.5rem 0;">
+
+            <p class="text-center text-white-50 mb-3" style="font-size:0.85rem; letter-spacing:1px; text-transform:uppercase;">Capas del proyecto</p>
+            <div class="row g-2 text-center" style="font-size:0.85rem;">
+                <div class="col-md-3">
+                    <div class="arch-node">
+                        <strong style="color:#92FE9D;">Presentación</strong><br>
+                        <span style="color:rgba(255,255,255,0.5)">Views / CSHTML + CSS + JS</span>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="arch-node">
+                        <strong style="color:#00C9FF;">Controladores</strong><br>
+                        <span style="color:rgba(255,255,255,0.5)">HomeController + GameHub</span>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="arch-node">
+                        <strong style="color:#FFB43C;">Servicios</strong><br>
+                        <span style="color:rgba(255,255,255,0.5)">RoomService (Singleton)</span>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="arch-node">
+                        <strong style="color:#C878FF;">Modelos</strong><br>
+                        <span style="color:rgba(255,255,255,0.5)">Player · Room · GameState</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
