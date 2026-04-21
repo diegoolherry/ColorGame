@@ -105,7 +105,6 @@ function setupSignalR() {
         playersList.forEach(p => {
             currentTimes[p] = 0;
         });
-        document.getElementById('used-colors').innerHTML = '';
         startGameTurn();
         showSection('game');
     });
