@@ -47,22 +47,8 @@ function formatTime(seconds) {
 }
 
 function renderBannedColors(bannedColors) {
+    // Colors are banned on the server but NOT shown to players (adds challenge)
     currentBannedColors = bannedColors || [];
-    const panel = document.getElementById('banned-colors-panel');
-    const list  = document.getElementById('banned-colors-list');
-    list.innerHTML = '';
-
-    if (currentBannedColors.length > 0) {
-        panel.classList.remove('d-none');
-        currentBannedColors.forEach(c => {
-            const span = document.createElement('span');
-            span.className = 'banned-color-badge';
-            span.textContent = c;
-            list.appendChild(span);
-        });
-    } else {
-        panel.classList.add('d-none');
-    }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -184,18 +170,9 @@ function setupSignalR() {
     // Admin: next partida within same round
     connection.on("NextPartidaReady", (players, bannedColors) => {
         allPlayers = players;
+        renderBannedColors(bannedColors); // stored internally, not shown
         updateLobby();
-        // Go straight back to lobby so admin can re-start
         showSection('lobby');
-        // Show banned colors info in lobby for reference
-        if (bannedColors.length > 0) {
-            const info = document.getElementById('start-error');
-            info.className = 'alert mt-3 fw-bold border-0';
-            info.style.background = 'rgba(255,180,60,0.2)';
-            info.style.color = '#FFB43C';
-            info.textContent = `🚫 Colores prohibidos esta ronda: ${bannedColors.join(', ')}`;
-            info.classList.remove('d-none');
-        }
     });
 
     // Admin: end round → leaderboard
