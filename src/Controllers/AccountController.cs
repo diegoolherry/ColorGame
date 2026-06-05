@@ -18,14 +18,15 @@ namespace ColorGame.Controllers
         [HttpGet]
         public IActionResult Register()
         {
-            if (User.Identity.IsAuthenticated) return RedirectToAction("Index", "Home");
+            if (User?.Identity?.IsAuthenticated == true) return RedirectToAction("Index", "Home");
             return View();
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            if (User.Identity.IsAuthenticated) return RedirectToAction("Index", "Home");
+            if (User?.Identity?.IsAuthenticated == true) return RedirectToAction("Index", "Home");
 
             if (ModelState.IsValid)
             {
@@ -49,15 +50,16 @@ namespace ColorGame.Controllers
         [HttpGet]
         public IActionResult Login(string returnUrl = null)
         {
-            if (User.Identity.IsAuthenticated) return RedirectToAction("Index", "Home");
+            if (User?.Identity?.IsAuthenticated == true) return RedirectToAction("Index", "Home");
             ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
         {
-            if (User.Identity.IsAuthenticated) return RedirectToAction("Index", "Home");
+            if (User?.Identity?.IsAuthenticated == true) return RedirectToAction("Index", "Home");
             ViewData["ReturnUrl"] = returnUrl;
 
             if (ModelState.IsValid)
@@ -79,6 +81,7 @@ namespace ColorGame.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
