@@ -1,0 +1,35 @@
+@model ColorGame.Models.RegisterViewModel
+@{
+    ViewData["Title"] = "Register";
+    Layout = "_NeonLayout";
+}
+
+<div class="neon-container">
+    <div class="neon-card">
+        <h2 class="neon-title" data-text="REGISTER">REGISTER</h2>
+        <form asp-action="Register" method="post" class="neon-form">
+            <div asp-validation-summary="ModelOnly" class="text-danger neon-error"></div>
+            <div class="form-group">
+                <label asp-for="Username" class="neon-label">USERNAME</label>
+                <input asp-for="Username" class="neon-input" autocomplete="off" />
+                <span asp-validation-for="Username" class="text-danger neon-val-error"></span>
+            </div>
+            <div class="form-group mt-3">
+                <label asp-for="Email" class="neon-label">EMAIL</label>
+                <input asp-for="Email" class="neon-input" autocomplete="off" />
+                <span asp-validation-for="Email" class="text-danger neon-val-error"></span>
+            </div>
+            <div class="form-group mt-3">
+                <label asp-for="Password" class="neon-label">PASSWORD</label>
+                <input asp-for="Password" class="neon-input" />
+                <span asp-validation-for="Password" class="text-danger neon-val-error"></span>
+            </div>
+            <div class="form-group mt-4 text-center">
+                <button type="submit" class="neon-btn">INITIALIZE</button>
+            </div>
+            <div class="form-group mt-3 text-center">
+                <a asp-action="Login" class="neon-link">ALREADY A PLAYER? LOGIN HERE</a>
+            </div>
+        </form>
+    </div>
+</div>

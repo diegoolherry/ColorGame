@@ -1,0 +1,155 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@400;700;900&display=swap');
+
+:root {
+    --bg-color: #050505;
+    --grid-color: #1a1a24;
+    --neon-blue: #00f3ff;
+    --neon-pink: #ff00ea;
+    --neon-green: #39ff14;
+    --font-main: 'Orbitron', sans-serif;
+    --font-retro: 'Press Start 2P', cursive;
+}
+
+body {
+    background-color: var(--bg-color);
+    background-image: linear-gradient(var(--grid-color) 1px, transparent 1px),
+                      linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+    background-size: 50px 50px;
+    background-position: center;
+    color: #fff;
+    font-family: var(--font-main);
+    overflow-x: hidden;
+}
+
+.neon-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+}
+
+.neon-card {
+    background: rgba(10, 10, 15, 0.85);
+    border: 2px solid var(--neon-blue);
+    box-shadow: 0 0 10px var(--neon-blue),
+                inset 0 0 15px rgba(0, 243, 255, 0.2);
+    padding: 3rem;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 500px;
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+}
+
+.neon-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 243, 255, 0.05) 2px,
+        rgba(0, 243, 255, 0.05) 4px
+    );
+    z-index: 0;
+    pointer-events: none;
+    animation: scanline 10s linear infinite;
+}
+
+@keyframes scanline {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(50px); }
+}
+
+.neon-title {
+    font-family: var(--font-retro);
+    font-size: 2rem;
+    color: #fff;
+    text-align: center;
+    margin-bottom: 2.5rem;
+    position: relative;
+    z-index: 1;
+    text-shadow: 2px 2px 0px var(--neon-pink),
+                 -2px -2px 0px var(--neon-blue);
+}
+
+.neon-form {
+    position: relative;
+    z-index: 1;
+}
+
+.neon-label {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--neon-blue);
+    margin-bottom: 0.5rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.neon-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid var(--neon-pink);
+    color: #fff;
+    font-family: var(--font-main);
+    font-size: 1.2rem;
+    padding: 0.5rem 0;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+.neon-input:focus {
+    border-bottom-color: var(--neon-green);
+    box-shadow: 0 10px 10px -10px var(--neon-green);
+}
+
+.neon-btn {
+    background: transparent;
+    color: var(--neon-blue);
+    font-family: var(--font-retro);
+    font-size: 1rem;
+    padding: 1rem 2rem;
+    border: 2px solid var(--neon-blue);
+    border-radius: 5px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.2s ease;
+    box-shadow: 0 0 10px var(--neon-blue) inset, 0 0 10px var(--neon-blue);
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.neon-btn:hover {
+    background: var(--neon-blue);
+    color: #000;
+    box-shadow: 0 0 20px var(--neon-blue), 0 0 40px var(--neon-blue);
+}
+
+.neon-link {
+    color: var(--neon-pink);
+    text-decoration: none;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    transition: text-shadow 0.3s;
+    display: inline-block;
+    margin-top: 1rem;
+}
+
+.neon-link:hover {
+    text-shadow: 0 0 8px var(--neon-pink);
+}
+
+.neon-val-error {
+    font-size: 0.8rem;
+    color: #ff3333;
+    text-shadow: 0 0 5px #ff3333;
+    margin-top: 0.3rem;
+    display: block;
+}
