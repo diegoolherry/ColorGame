@@ -24,6 +24,7 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options => {
 builder.Services.AddControllersWithViews();
 builder.Services.AddSignalR();
 builder.Services.AddSingleton<ColorGame.Services.RoomService>();
+builder.Services.AddSingleton<ColorGame.Services.TurnTimerService>();
 
 var app = builder.Build();
 

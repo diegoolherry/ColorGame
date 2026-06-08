@@ -11,7 +11,7 @@
 <div id="section-initial">
     <div class="text-center mb-5">
         <h1 class="display-3 fw-bold" style="text-shadow: 0 4px 15px rgba(0,0,0,0.3);">ColorGame</h1>
-        <p class="fs-4 text-white-50">El juego de rapidez mental y colores que nadie pidió pero todos necesitan.</p>
+        <p class="fs-4 text-white-50">El juego de rapidez mental que nadie pidió pero todos necesitan.</p>
     </div>
 
     <div class="row g-5 max-w-4xl mx-auto justify-content-center" style="max-width: 900px;">
@@ -22,6 +22,11 @@
                 </div>
                 <h2 class="mb-4 fw-bold">Crear Nueva Sala</h2>
                 <input type="text" id="admin-name" class="form-control form-control-glass mb-4" placeholder="Ingresa tu nombre..." autocomplete="off" value="@User.Identity?.Name" readonly />
+                <select id="room-category" class="form-select form-control-glass mb-4">
+                    <option value="Colores">🎨 Colores</option>
+                    <option value="Países">🌍 Países</option>
+                    <option value="Animales">🐾 Animales</option>
+                </select>
                 <button id="btn-create-room" class="btn btn-glass btn-action w-100 fs-5 py-3">Iniciar Aventura</button>
                 <div id="create-error" class="alert alert-danger mt-3 d-none fw-bold bg-danger text-white border-0"></div>
             </div>
@@ -64,6 +69,8 @@
                 <div class="spinner-grow spinner-grow-sm text-light me-2" role="status"></div>
                 <span class="fs-5 fw-light">Esperando que el rey de la sala inicie el juego...</span>
             </div>
+
+            <div class="ad-container mt-4 text-center"></div>
         </div>
     </div>
 </div>
@@ -121,7 +128,7 @@
             </style>
 
             <h1 class="display-3 fw-bold mb-2">¡<span id="loser-name" class="text-white"></span> perdió!</h1>
-            <h3 class="fw-light mb-5 bg-black bg-opacity-25 d-inline-block px-4 py-2 rounded-pill">Repitió el color: <strong id="losing-color" style="color: #FFB8D2;"></strong></h3>
+            <h3 class="fw-light mb-5 bg-black bg-opacity-25 d-inline-block px-4 py-2 rounded-pill">Palabra repetida: <strong id="losing-color" style="color: #FFB8D2;"></strong></h3>
             
             <p class="fs-4 mb-4">La partida duró <strong id="total-time"></strong></p>
 
@@ -150,6 +157,8 @@
             </div>
             
             <button id="btn-go-home" class="btn btn-glass w-100 py-3 fs-4 shadow-sm">Volver al Inicio 🏠</button>
+
+            <div class="ad-container mt-4 text-center"></div>
         </div>
     </div>
 </div>

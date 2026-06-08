@@ -8,4 +8,4 @@
 *.sln.docstates
 appsettings.Development.json
 plan_implementacion.md
-
+.agents/docs/

@@ -11,7 +11,7 @@ namespace ColorGame.Services
         private readonly object _lock = new();
         private readonly Random _random = new();
 
-        public Room CreateRoom(string adminName, string connectionId)
+        public Room CreateRoom(string adminName, string connectionId, string category = "Colores")
         {
             lock (_lock)
             {
@@ -21,7 +21,7 @@ namespace ColorGame.Services
                     code = _random.Next(100000, 999999).ToString();
                 } while (_rooms.ContainsKey(code));
 
-                var room = new Room { Code = code };
+                var room = new Room { Code = code, Category = category };
                 room.Players.Add(new Player
                 {
                     ConnectionId = connectionId,

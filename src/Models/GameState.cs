@@ -1,3 +1,5 @@
+using System.Threading;
+
 namespace ColorGame.Models
 {
     public class GameState
@@ -9,5 +11,6 @@ namespace ColorGame.Models
         public string? LoserName { get; set; }
         public string? LosingColor { get; set; }
         public double TotalSeconds { get; set; } = 0;
+        public CancellationTokenSource? TurnTimerTokenSource { get; set; }
     }
 }

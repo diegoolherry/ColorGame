@@ -3,6 +3,7 @@ let myName = "";
 let myRole = ""; // "Admin" or "Player"
 let roomCode = "";
 let currentPlayerName = "";
+let currentCategory = "Colores";
 let timerInterval = null;
 let turnStartTime = null;
 let currentTimes = {};
@@ -20,6 +21,21 @@ const sections = {
 function showSection(id) {
     Object.values(sections).forEach(s => s.classList.add('d-none'));
     sections[id].classList.remove('d-none');
+    if (id === 'lobby' || id === 'gameover') {
+        refreshAd(id);
+    }
+}
+
+function refreshAd(sectionId) {
+    const section = sections[sectionId];
+    if (!section) return;
+    const container = section.querySelector('.ad-container');
+    if (!container) return;
+    container.innerHTML = '';
+    const mock = document.createElement('div');
+    mock.className = 'adsense-mock';
+    mock.textContent = 'Publicidad';
+    container.appendChild(mock);
 }
 
 function stopTimer() {
@@ -38,6 +54,17 @@ function formatTime(seconds) {
     let s = Math.floor(seconds % 60);
     let d = Math.floor((seconds * 10) % 10);
     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}.${d}`;
+}
+
+function updateUIForCategory() {
+    const input = document.getElementById('color-input');
+    if (!input) return;
+    const placeholders = {
+        'Colores': 'Escribe un color...',
+        'Pa\u00edses': 'Escribe un pa\u00eds...',
+        'Animales': 'Escribe un animal...'
+    };
+    input.placeholder = placeholders[currentCategory] || 'Escribe una respuesta...';
 }
 
 // --- SignalR Setup ---
@@ -60,21 +87,25 @@ function setupSignalR() {
         overlay.classList.add('d-none');
     });
 
-    connection.on("RoomCreated", (code) => {
+    connection.on("RoomCreated", (code, category) => {
         roomCode = code;
+        currentCategory = category || "Colores";
         myRole = "Admin";
         allPlayers = [myName];
         updateLobby();
+        updateUIForCategory();
         showSection('lobby');
         document.getElementById('lobby-admin-controls').classList.remove('d-none');
         document.getElementById('lobby-player-message').classList.add('d-none');
     });
 
-    connection.on("JoinedRoom", (code, players) => {
+    connection.on("JoinedRoom", (code, players, category) => {
         roomCode = code;
+        currentCategory = category || "Colores";
         myRole = "Player";
         allPlayers = players;
         updateLobby();
+        updateUIForCategory();
         showSection('lobby');
         document.getElementById('lobby-admin-controls').classList.add('d-none');
         document.getElementById('lobby-player-message').classList.remove('d-none');
@@ -274,8 +305,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const name = document.getElementById('admin-name').value.trim();
         if (!name) return;
         myName = name;
+        const category = document.getElementById('room-category').value;
         document.getElementById('create-error').classList.add('d-none');
-        connection.invoke("CreateRoom", myName).catch(err => console.error(err.toString()));
+        connection.invoke("CreateRoom", myName, category).catch(err => console.error(err.toString()));
     });
 
     document.getElementById('btn-join-room').addEventListener('click', () => {

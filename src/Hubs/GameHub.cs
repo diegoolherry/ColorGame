@@ -11,17 +11,19 @@ namespace ColorGame.Hubs
     public class GameHub : Hub
     {
         private readonly RoomService _roomService;
+        private readonly TurnTimerService _timerService;
 
-        public GameHub(RoomService roomService)
+        public GameHub(RoomService roomService, TurnTimerService timerService)
         {
             _roomService = roomService;
+            _timerService = timerService;
         }
 
-        public async Task CreateRoom(string adminName)
+        public async Task CreateRoom(string adminName, string category = "Colores")
         {
-            var room = _roomService.CreateRoom(adminName, Context.ConnectionId);
+            var room = _roomService.CreateRoom(adminName, Context.ConnectionId, category);
             await Groups.AddToGroupAsync(Context.ConnectionId, room.Code);
-            await Clients.Caller.SendAsync("RoomCreated", room.Code);
+            await Clients.Caller.SendAsync("RoomCreated", room.Code, room.Category);
         }
 
         public async Task JoinRoom(string roomCode, string playerName)
@@ -37,7 +39,7 @@ namespace ColorGame.Hubs
             await Groups.AddToGroupAsync(Context.ConnectionId, roomCode);
             
             var playerNames = room!.Players.Select(p => p.Name).ToList();
-            await Clients.Caller.SendAsync("JoinedRoom", roomCode, playerNames);
+            await Clients.Caller.SendAsync("JoinedRoom", roomCode, playerNames, room.Category);
             await Clients.GroupExcept(roomCode, Context.ConnectionId).SendAsync("PlayerJoined", playerName, playerNames);
         }
 
@@ -61,6 +63,7 @@ namespace ColorGame.Hubs
 
             var allNames = room.Players.Select(p => p.Name).ToList();
             await Clients.Group(roomCode).SendAsync("GameStarted", gamePlayers[0].Name, allNames);
+            _timerService.StartTurnTimer(roomCode, gamePlayers[0].Name);
         }
 
         public async Task SubmitColor(string roomCode, string color, double elapsedSeconds)
@@ -79,6 +82,8 @@ namespace ColorGame.Hubs
 
             lock (room)
             {
+                if (room.Game.IsOver) return;
+
                 var gamePlayers = room.GamePlayers;
                 if (gamePlayers.Count == 0 || room.Game.CurrentPlayerIndex >= gamePlayers.Count) return;
 
@@ -103,7 +108,7 @@ namespace ColorGame.Hubs
                     totalSeconds = room.Game.TotalSeconds;
                     scores = gamePlayers
                         .OrderBy(p => p.AccumulatedSeconds)
-                        .Select(p => (object)new { Name = p.Name, AccumulatedSeconds = p.AccumulatedSeconds })
+                        .Select(p => (object)new { name = p.Name, accumulatedSeconds = p.AccumulatedSeconds })
                         .ToList();
                 }
                 else
@@ -119,10 +124,12 @@ namespace ColorGame.Hubs
 
             if (isGameOver)
             {
+                _timerService.CancelTimer(roomCode);
                 await Clients.Group(roomCode).SendAsync("GameOver", loserName, losingColor, totalSeconds, scores);
             }
             else if (!string.IsNullOrEmpty(nextPlayerName))
             {
+                _timerService.StartTurnTimer(roomCode, nextPlayerName);
                 await Clients.Group(roomCode).SendAsync("NextTurn", nextPlayerName, color, currentPlayerName);
             }
         }
@@ -132,6 +139,7 @@ namespace ColorGame.Hubs
             var room = _roomService.GetRoom(roomCode);
             if (room == null || room.Admin?.ConnectionId != Context.ConnectionId) return;
 
+            _timerService.CancelTimer(roomCode);
             _roomService.ResetGame(roomCode);
             var names = room.Players.Select(p => p.Name).ToList();
             await Clients.Group(roomCode).SendAsync("GameReset", names);
@@ -159,6 +167,7 @@ namespace ColorGame.Hubs
 
                     if (isAdmin)
                     {
+                        _timerService.CancelTimer(roomCode);
                         _roomService.RemoveRoom(roomCode);
                         await Clients.Group(roomCode).SendAsync("AdminLeft");
                     }
@@ -180,9 +189,10 @@ namespace ColorGame.Hubs
                                 
                                 var scores = gamePlayers
                                     .OrderBy(p => p.AccumulatedSeconds)
-                                    .Select(p => new { Name = p.Name, AccumulatedSeconds = p.AccumulatedSeconds })
+                                    .Select(p => new { name = p.Name, accumulatedSeconds = p.AccumulatedSeconds })
                                     .ToList();
 
+                                _timerService.CancelTimer(roomCode);
                                 await Clients.Group(roomCode).SendAsync("GameOver", room.Game.LoserName, room.Game.LosingColor, room.Game.TotalSeconds, scores);
                             }
                             else if (indexBeforeRemoval != -1)
@@ -192,6 +202,7 @@ namespace ColorGame.Hubs
                                     // It was their turn. Turn shifts to current index modulo count
                                     room.Game.CurrentPlayerIndex = room.Game.CurrentPlayerIndex % gamePlayers.Count;
                                     var nextPlayer = gamePlayers[room.Game.CurrentPlayerIndex];
+                                    _timerService.StartTurnTimer(roomCode, nextPlayer.Name);
                                     await Clients.Group(roomCode).SendAsync("NextTurn", nextPlayer.Name, "Abandono turno", leavingPlayerName);
                                 }
                                 else if (indexBeforeRemoval < room.Game.CurrentPlayerIndex)
