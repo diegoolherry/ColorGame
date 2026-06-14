@@ -18,14 +18,6 @@ build_property.GenerateRazorMetadataSourceChecksumAttributes =
 build_property.MSBuildProjectDirectory = D:\CTC\Semestre-3\Programacion-3\JuegoColores\ColorGame\src
 build_property._RazorSourceGeneratorDebug = 
 
-[D:/CTC/Semestre-3/Programacion-3/JuegoColores/ColorGame/src/Views/Account/Login.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxMb2dpbi5jc2h0bWw=
-build_metadata.AdditionalFiles.CssScope = 
-
-[D:/CTC/Semestre-3/Programacion-3/JuegoColores/ColorGame/src/Views/Account/Register.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxSZWdpc3Rlci5jc2h0bWw=
-build_metadata.AdditionalFiles.CssScope = 
-
 [D:/CTC/Semestre-3/Programacion-3/JuegoColores/ColorGame/src/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 

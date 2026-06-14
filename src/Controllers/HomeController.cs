@@ -2,11 +2,8 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using ColorGame.Models;
 
-using Microsoft.AspNetCore.Authorization;
-
 namespace ColorGame.Controllers;
 
-[Authorize]
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;

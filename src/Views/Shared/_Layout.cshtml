@@ -173,18 +173,6 @@
         <div class="container">
             <a class="navbar-brand fw-bold" asp-controller="Home" asp-action="Index">ColorGame</a>
             <div class="d-flex ms-auto align-items-center">
-                @if (User.Identity.IsAuthenticated)
-                {
-                    <span class="text-white me-3">Welcome, <strong>@User.Identity.Name</strong>!</span>
-                    <form asp-controller="Account" asp-action="Logout" method="post" class="m-0">
-                        <button type="submit" class="btn btn-sm btn-outline-light" style="border-radius: 20px;">Logout</button>
-                    </form>
-                }
-                else
-                {
-                    <a asp-controller="Account" asp-action="Login" class="btn btn-sm btn-outline-light me-2" style="border-radius: 20px;">Login</a>
-                    <a asp-controller="Account" asp-action="Register" class="btn btn-sm btn-light" style="border-radius: 20px; color: #784BA0;">Register</a>
-                }
             </div>
         </div>
     </nav>

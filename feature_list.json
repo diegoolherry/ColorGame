@@ -1,0 +1,28 @@
+{
+  "features": [
+    {
+      "id": "F001",
+      "name": "Múltiples Categorías",
+      "description": "Modificar el juego para que al crear la sala el administrador elija si juegan con Colores, Países o Animales.",
+      "status": "done"
+    },
+    {
+      "id": "F002",
+      "name": "Temporizador por Turno",
+      "description": "Agrega un límite de 10 segundos por turno. Si el tiempo se acaba, el jugador pierde.",
+      "status": "done"
+    },
+    {
+      "id": "F003",
+      "name": "Banners de AdSense",
+      "description": "Integrar recuadros de publicidad de AdSense en las pantallas de Lobby y GameOver para monetización pasiva.",
+      "status": "pending"
+    },
+    {
+      "id": "F004",
+      "name": "Completar Setup en Render",
+      "description": "Subir los cambios a GitHub, crear base de datos PostgreSQL en Render y configurar la variable de entorno DATABASE_URL en el Web Service.",
+      "status": "pending"
+    }
+  ]
+}

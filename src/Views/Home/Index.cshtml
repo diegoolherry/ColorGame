@@ -21,7 +21,7 @@
                     <span style="font-size: 4rem;">👑</span>
                 </div>
                 <h2 class="mb-4 fw-bold">Crear Nueva Sala</h2>
-                <input type="text" id="admin-name" class="form-control form-control-glass mb-4" placeholder="Ingresa tu nombre..." autocomplete="off" value="@User.Identity?.Name" readonly />
+                <input type="text" id="admin-name" class="form-control form-control-glass mb-4" placeholder="Ingresa tu nombre..." autocomplete="off" />
                 <select id="room-category" class="form-select form-control-glass mb-4">
                     <option value="Colores">🎨 Colores</option>
                     <option value="Países">🌍 Países</option>
@@ -37,7 +37,7 @@
                     <span style="font-size: 4rem;">🤝</span>
                 </div>
                 <h2 class="mb-4 fw-bold">Unirse a Sala</h2>
-                <input type="text" id="player-name" class="form-control form-control-glass mb-3" placeholder="Ingresa tu nombre..." autocomplete="off" value="@User.Identity?.Name" readonly />
+                <input type="text" id="player-name" class="form-control form-control-glass mb-3" placeholder="Ingresa tu nombre..." autocomplete="off" />
                 <input type="text" id="join-code" class="form-control form-control-glass mb-4 text-center code-display-input" style="font-size: 1.5rem; letter-spacing: 0.5rem; text-transform: uppercase;" placeholder="CÓDIGO" maxlength="6" autocomplete="off" />
                 <button id="btn-join-room" class="btn btn-glass w-100 fs-5 py-3">Entrar a la Sala</button>
                 <div id="join-error" class="alert alert-danger mt-3 d-none fw-bold bg-danger text-white border-0"></div>

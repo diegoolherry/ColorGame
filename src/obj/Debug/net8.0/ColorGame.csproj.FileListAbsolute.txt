@@ -157,3 +157,5 @@ D:\CTC\Semestre-3\Programacion-3\JuegoColores\ColorGame\src\obj\Debug\net8.0\sco
 D:\CTC\Semestre-3\Programacion-3\JuegoColores\ColorGame\src\obj\Debug\net8.0\ColorGame.csproj.Up2Date
 D:\CTC\Semestre-3\Programacion-3\JuegoColores\ColorGame\src\obj\Debug\net8.0\ColorGame.genruntimeconfig.cache
 D:\CTC\Semestre-3\Programacion-3\JuegoColores\ColorGame\src\obj\Debug\net8.0\ref\ColorGame.dll
+D:\CTC\Semestre-3\Programacion-3\JuegoColores\ColorGame\src\bin\Debug\net8.0\Npgsql.dll
+D:\CTC\Semestre-3\Programacion-3\JuegoColores\ColorGame\src\bin\Debug\net8.0\Npgsql.EntityFrameworkCore.PostgreSQL.dll

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ColorGame")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e12edb1e74de520765d841560ddd316f4e758f86")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d30e3e4dfbfe9b30f986f1cabaa52f662537bf1c")]
 [assembly: System.Reflection.AssemblyProductAttribute("ColorGame")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ColorGame")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
