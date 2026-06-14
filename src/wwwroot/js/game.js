@@ -32,10 +32,18 @@ function refreshAd(sectionId) {
     const container = section.querySelector('.ad-container');
     if (!container) return;
     container.innerHTML = '';
-    const mock = document.createElement('div');
-    mock.className = 'adsense-mock';
-    mock.textContent = 'Publicidad';
-    container.appendChild(mock);
+    const ins = document.createElement('ins');
+    ins.className = 'adsbygoogle';
+    ins.style.display = 'block';
+    ins.setAttribute('data-ad-client', 'ca-pub-5091387072483770');
+    ins.setAttribute('data-ad-format', 'auto');
+    ins.setAttribute('data-full-width-responsive', 'true');
+    container.appendChild(ins);
+    try {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    } catch (e) {
+        console.error('AdSense error:', e);
+    }
 }
 
 function stopTimer() {
