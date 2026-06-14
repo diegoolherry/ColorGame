@@ -22,7 +22,7 @@
       "id": "F004",
       "name": "Completar Setup en Render",
       "description": "Subir los cambios a GitHub, crear base de datos PostgreSQL en Render y configurar la variable de entorno DATABASE_URL en el Web Service.",
-      "status": "pending"
+      "status": "done"
     }
   ]
 }
