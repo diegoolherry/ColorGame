@@ -170,13 +170,7 @@
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark" style="background: rgba(0,0,0,0.2); backdrop-filter: blur(10px);">
-        <div class="container">
-            <a class="btn btn-outline-light fw-bold text-uppercase" asp-controller="Home" asp-action="Index" style="border-radius: 1rem; border-width: 2px;">&larr; Menú</a>
-            <div class="d-flex ms-auto align-items-center">
-            </div>
-        </div>
-    </nav>
+    <a class="btn btn-outline-light fw-bold text-uppercase" asp-controller="Home" asp-action="Index" style="border-radius: 1rem; border-width: 2px; position: absolute; top: 20px; left: 20px; z-index: 1050;">&larr; Menú</a>
     <div class="container py-4">
         @RenderBody()
     </div>
